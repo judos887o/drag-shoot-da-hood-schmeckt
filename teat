@@ -1,0 +1,36 @@
+--// AUTO SHOOT – MAUS HALTEN = JITTER CLICK //--
+
+local Players          = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService       = game:GetService("RunService")
+local VirtualUser      = game:GetService("VirtualUser")
+
+local lp = Players.LocalPlayer
+
+local holding = false
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        holding = true
+        task.spawn(function()
+            while holding do
+                pcall(function()
+                    VirtualUser:CaptureController()
+                    VirtualUser:Button1Down(Vector2.new(0,0))
+                end)
+                task.wait(0.02)
+                pcall(function()
+                    VirtualUser:Button1Up(Vector2.new(0,0))
+                end)
+                task.wait(0.01)
+            end
+        end)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gp)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        holding = false
+    end
+end)
